@@ -1,0 +1,66 @@
+<resources>
+    <string name="app_name">Unbounded - Realizing Self</string>
+    <string name="app_name_capital">UNBOUNDED</string>
+    <string name="please_enter_your_phone_number_to_continue_sign_up_to_the_app">Please enter your phone number to continue sign up to the app.</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="enter_phone_number">Enter phone number*</string>
+    <string name="enter_mobile_no">Enter Mobile No.</string>
+    <string name="verification">Verification</string>
+    <string name="we_will_send_an_otp_to_the_phone_number">We will send an OTP to the phone number</string>
+    <string name="resend">Resend</string>
+    <string name="didn_t_receive_code">Didn’t receive code?</string>
+    <string name="personal_details">Personal Details</string>
+    <string name="please_enter_below_information">Please enter below information.</string>
+    <string name="name">Name</string>
+    <string name="enter_name">Enter Name</string>
+    <string name="designation">Designation</string>
+
+    <string name="MAPS_API_KEY">AIzaSyCRhSgG2H_Eq0zZht0ii8mshoFf5Y7o_9E</string>
+    <string name="phone_number_">Phone number*</string>
+    <string name="sign_in">Sign In</string>
+    <string name="please_enter_your_phone_number_to_continue_sign_in_to_the_app">Please enter your phone number to continue sign in to the app</string>
+    <string name="unbounded">Unbounded</string>
+    <string name="sign_in_cap">SIGN IN</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="forgot_password_">Forgot Password</string>
+    <string name="continue_">CONTINUE</string>
+    <string name="logout">LOGOUT</string>
+    <string name="send">SEND</string>
+    <string name="please_enter_your_email_address_you_will_receive_a_link_to_create_a_new_password">Please enter your email address. You will receive a link to create a new password.</string>
+    <string name="verification_">Verification</string>
+    <string name="enter_the_verification_code_we_just_sent_your_on_your_email_address">"Enter the verification code we just sent you on your email address. "</string>
+    <string name="resend_now">RESEND NOW</string>
+    <string name="didn_t_receive_code_">Didn\'t receive code?</string>
+    <string name="please_enter_reminder_name">Please enter reminder name</string>
+    <string name="change_password">Change Password</string>
+    <string name="save">SAVE</string>
+    <string name="invite">INVITE</string>
+    <string name="create">CREATE</string>
+    <string name="time_meditating">Time Meditating</string>
+    <string name="log_meditation_session_manually">Log meditation session manually</string>
+    <string name="privacy_settings">Privacy Settings</string>
+    <string name="about_text">This app is an offering of peak leadership institute. we help leaders
+    and organization engage is profound growth processes through integrative wellness programs,
+        team leadership development, and executive coaching.
+        if you\'d like to learn more about our work,
+        send us a note any time.</string>
+    <string name="set_new_password">Set New Password</string>
+    <string name="add_another_time_segment">+ Add another time segment</string>
+    <string name="re_assign_admin">Re-assign Admin</string>
+    <string name="group_statics">Group Statistics</string>
+    <string name="total_days">Total Days</string>
+    <string name="_2x_day">2x/day</string>
+    <string name="total_meditations">Total meditations</string>
+    <string name="statistics">Statistics</string>
+    <string name="quick_tips">Quick Tips</string>
+
+    <string-array name="local_business">
+
+        <item>Local 1</item>
+        <item>Local 2</item>
+        <item>Local 3</item>
+        <item>Local 4</item>
+        <item>Local 5</item>
+
+    </string-array>
+</resources>

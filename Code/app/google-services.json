@@ -1,0 +1,56 @@
+{
+  "project_info": {
+    "project_number": "426473514706",
+    "firebase_url": "https://realizationselfunbounded-default-rtdb.firebaseio.com",
+    "project_id": "realizationselfunbounded",
+    "storage_bucket": "realizationselfunbounded.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:426473514706:android:cf429cc6e9c49ea2582f0b",
+        "android_client_info": {
+          "package_name": "com.unbounded.realizingself"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "426473514706-k74veftl4nk5d3eg8n8bad30nl8u1kn4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.unbounded.realizingself",
+            "certificate_hash": "6775e49b744f6176271923eb7eef4464e783190d"
+          }
+        },
+        {
+          "client_id": "426473514706-0camk8j8jkej513avpj6r2bc8uhhpp1p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrqLFvCt2PQJwluWRr7qaKhn9c8s1KDOM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "426473514706-0camk8j8jkej513avpj6r2bc8uhhpp1p.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "426473514706-591afpd9p2dgq5mm2gtcnqcu3jf9c25r.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.unbounded.realizingself",
+                "app_store_id": "6480166556"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
