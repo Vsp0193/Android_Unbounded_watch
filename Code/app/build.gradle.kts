@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.compose.compiler)
+   // alias(libs.plugins.compose.compiler)
   //  id("org.jetbrains.compose") version "1.5.0" // Add this plugin for Compose Compiler
     //id("com.google.devtools.ksp") version "1.8.21-1.0.11" apply false
     kotlin("kapt")
@@ -29,7 +31,12 @@ android {
            // exclude module: 'konan.target'
         }
     }
-
+    buildFeatures {
+        compose =true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion= "1.5.3"
+    }
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -50,7 +57,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+       // kotlinCompilerExtensionVersion = "1.5.7"
     }
     packaging {
         resources {

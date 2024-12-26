@@ -16,7 +16,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import com.unbounded.realizingself.R
-import com.peak.unbounded.features.common.NoRippleInteractionSource
+import com.unbounded.realizingself.common.NoRippleInteractionSource
 
 
 @Composable

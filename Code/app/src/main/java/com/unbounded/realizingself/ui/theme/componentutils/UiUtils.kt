@@ -29,10 +29,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.peak.unbounded.R
-import com.peak.unbounded.features.ui.theme.TintEyeColor
-import com.peak.unbounded.features.ui.theme.cyanColor
-import com.peak.unbounded.features.ui.theme.red
+import com.unbounded.realizingself.R
+import com.unbounded.realizingself.ui.theme.TintEyeColor
+import com.unbounded.realizingself.ui.theme.cyanColor
+import com.unbounded.realizingself.ui.theme.red
 
 class UiUtils {
 companion object {
