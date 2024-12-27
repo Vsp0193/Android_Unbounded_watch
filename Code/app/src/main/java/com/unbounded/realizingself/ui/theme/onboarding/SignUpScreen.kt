@@ -153,12 +153,12 @@ fun SignUpScreen(
                             if (fNameState.text.isNotEmpty() && lNameState.text.isNotEmpty() &&
                                 emailState.isValid && passwordState.isValid
                             ) {
-                                viewModel.signUp(
+                             /*   viewModel.signUp(
                                     fNameState.text,
                                     lNameState.text,
                                     emailState.text,
                                     passwordState.text
-                                )
+                                )*/
                             } else {
                                 emailState.enableShowErrors()
                             }
@@ -202,7 +202,7 @@ fun SignUpScreen(
                         )
                     )
 
-                    when (val response = signUpResult) {
+                  /*  when (val response = signUpResult) {
                         is Response.Error -> Toast(message = response.errorMessage.toString())
                         is Response.Loading -> {
                             SpinningProgressBar(
@@ -220,7 +220,7 @@ fun SignUpScreen(
 
                         else -> {}
                     }
-
+*/
 
                 }
                 Spacer(

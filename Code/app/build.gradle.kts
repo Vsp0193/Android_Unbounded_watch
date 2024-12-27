@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.hilt.android)
    // alias(libs.plugins.compose.compiler)
   //  id("org.jetbrains.compose") version "1.5.0" // Add this plugin for Compose Compiler
     //id("com.google.devtools.ksp") version "1.8.21-1.0.11" apply false
@@ -14,7 +15,7 @@ android {
 
     defaultConfig {
         applicationId = "com.unbounded.realizingself"
-        minSdk = 24
+        minSdk = 25
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -171,6 +172,10 @@ dependencies {
 
     implementation(libs.sh.reorderable)
 
+    implementation(libs.androidx.compose.material)
+    implementation(libs.androidx.compose.foundation)
+    //window size dependency to get size of screen
+    implementation(libs.androidx.material3.windowsizeclass)
 
 }
 // Allow references to generated code
