@@ -262,7 +262,7 @@ fun SignUpScreen(
                     }
                 }, onClick = {
                     println("Clicked offset $it")
-                    navHostController.navigate(OnBoardingGraph.SignInScreen.route)
+                  //  navHostController.navigate(OnBoardingGraph.SignInScreen.route)
                     // naveHostController.popBackStack()
                 })
 

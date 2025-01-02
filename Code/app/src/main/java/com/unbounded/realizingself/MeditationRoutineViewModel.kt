@@ -1,11 +1,11 @@
 package com.unbounded.realizingself
 
-import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.peak.unbounded.features.data.local.DataViewModel
+import androidx.navigation.NavHostController
+import com.unbounded.realizingself.NAVIGATION.OnBoardingGraph
 import com.unbounded.realizingself.data.remote.retrofitapi.Response
 import com.unbounded.realizingself.data.repository.UnboundRepository
 import com.unbounded.realizingself.model.segment.MeditationRoutineSegmentResponse
@@ -15,8 +15,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.json.JSONArray
-import org.json.JSONException
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -66,9 +64,11 @@ class MeditationRoutineViewModel @Inject constructor(val repository: UnboundRepo
     }
 
     fun activeMeditationRoutineList(
-        dataStoreViewModel: DataViewModel,
+        dataTransferViewModel: DataTransferViewModel,
+        navController : NavHostController,
         token: String,
         presetId: Int,
+        userId: Int,
     ) {
         val request_data = JSONObject()
 
@@ -91,55 +91,65 @@ class MeditationRoutineViewModel @Inject constructor(val repository: UnboundRepo
 
                         is Response.Success -> {
                             isLoading.value = false
-                            getMeditationSegmentList(dataStoreViewModel,dataStoreViewModel.getToken()!!,dataStoreViewModel.getUserId()!!)
+                           // getMeditationSegmentList(dataStoreViewModel,navController,dataStoreViewModel.getToken()!!,dataStoreViewModel.getUserId()!!)
+                            getMeditationSegmentList(dataTransferViewModel,navController,token, userId =userId )
                             Log.d("addMeditationNote", "addMeditationNote: ${response.data}")
                         }
                         else -> {}
                     }
                 } catch (e: Exception) {
                     isLoading.value = false
+                    Log.e("activeMeditationRoutineList", "qqError: ${e.message}", e)
                     loadError.value = "Ui Error"
+
                 }
             }
         }
     }
+
     fun getMeditationSegmentList(
-        dataStoreViewModel: DataViewModel,
+        dataStoreViewModel: DataTransferViewModel,
+        navController : NavHostController,
         token: String,
         userId: Int,
-    ) {
-        Log.d("delete", "deleteMeditat ")
-        viewModelScope.launch (Dispatchers.IO) {
+    )   {
+        viewModelScope.launch (Dispatchers.Main) {
 
             try {
                 val response =
                     repository.getMeditationSegmentList(token,userId)
                 when (response) {
                     is Response.Error -> {
-                        isLoading.value = false
+                     //   isLoading.value = false
                         loadError.value = response.errorMessage
                     }
 
                     is Response.Loading -> {
-                        isLoading.value = true
+                      //  isLoading.value = true
                         dataMessage.value = ""
                     }
 
                     is Response.Success -> {
-                        isLoading.value = false
+                        //isLoading.value = false
                         timeSegmentResponseData.value = response.data
-                        Log.d("dwhdvwdjqdjqjdqjd", "deleteMeditat Response.Success")
-                        Log.d("addMeditationNote", "addMeditationNote: ${response.data}")
+                        Log.d("addMeditationNote", "addMeditationNoteResponse: ${response.data}")
+
+                        dataStoreViewModel.saveUser( timeSegmentResponseData.value)
+                        Log.d("addMeditationNote", "saveUser: ${dataStoreViewModel.getUser()}")
+                        navController.navigate("${ OnBoardingGraph.StartScreen.route }")
+
                     }
                     else -> {}
                 }
             } catch (e: Exception) {
                 isLoading.value = false
                 loadError.value = "Ui Error"
+
             }
 
         }
     }
+
  /*   fun getMeditationSegmentList(
         dataStoreViewModel: DataViewModel,
         token: String,

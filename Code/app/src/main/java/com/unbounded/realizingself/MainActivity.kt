@@ -7,17 +7,22 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Chip
+import androidx.compose.material.ChipColors
+import androidx.compose.material.ChipDefaults
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -28,7 +33,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
@@ -44,13 +48,19 @@ import androidx.navigation.NavHostController
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material.TimeText
+import androidx.wear.compose.material.TimeTextDefaults
+import androidx.wear.compose.material.TimeTextDefaults.TimeFormat12Hours
 import com.peak.unbounded.features.data.local.DataViewModel
 import com.unbounded.realizingself.NAVIGATION.OnBoardingGraph
 import com.unbounded.realizingself.NAVIGATION.ScreenNavigationGraph
+import com.unbounded.realizingself.common.SpinningProgressBar
 import com.unbounded.realizingself.ui.theme.RealizingSelfTheme
+import com.unbounded.realizingself.ui.theme.black
 import com.unbounded.realizingself.ui.theme.blue
 import com.unbounded.realizingself.ui.theme.primary
 import com.unbounded.realizingself.ui.theme.secondary
+import com.unbounded.realizingself.ui.theme.transparant
+import com.unbounded.realizingself.ui.theme.white
 import com.unbounded.realizingself.utils.AppUtility
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -58,6 +68,7 @@ import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -75,21 +86,27 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun RoutineListScreen(
-    // Allow a modifier to be passed
+    dataTransferViewModel: DataTransferViewModel,
     navHostController: NavHostController,
+
 ) {
     val context = LocalContext.current
-    val token =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTcxMCwiaWF0IjoxNzM1MjgxNDI5fQ.UFZJNMJDqLKCu24qEnfBVA97M30lDao7pjVFAlBGv88"
-    val id = 1710
+    val manageUser = true
+   val token =
+      if (manageUser){
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTcxMCwiaWF0IjoxNzM1MjgxNDI5fQ.UFZJNMJDqLKCu24qEnfBVA97M30lDao7pjVFAlBGv88"
+      }else {
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTUzMiwiaWF0IjoxNzM1NTQ5MjQ1fQ.-oQzcYFTomu5y25G90-yDDqEUAw8X9AaSwicrZb1EnY"
+      }
+    val userID =  if (manageUser){
+        1710
+    }else
+        1532
     val scope = rememberCoroutineScope()
     val viewModel: MeditationRoutineViewModel = hiltViewModel()
-    val timeSegmentResponseDataApiData = remember {
-        viewModel.timeSegmentResponseData
-    }
+
+
     val dataStoreViewModel: DataViewModel = hiltViewModel()
-    val timeSegmentResponseData =
-        timeSegmentResponseDataApiData.value?.userTimeSegments?.toMutableList() ?: mutableListOf()
 
     val userMeditationRoutineListApiData = remember {
         viewModel.responseData
@@ -110,14 +127,15 @@ fun RoutineListScreen(
     val dataMessage = remember {
         viewModel.dataMessage
     }
-    LaunchedEffect(timeSegmentResponseDataApiData.value) {
+ /*   LaunchedEffect(timeSegmentResponseDataApiData.value) {
 
         withContext(Dispatchers.Main) {
+            Log.d("callfowedfwodw", "RoutineListScreen: callfowedfwodw")
             navHostController.navigate("${OnBoardingGraph.StartScreen.route}/$timeSegmentResponseDataApiData.value")
 
         }
     }
-
+*/
 
     LaunchedEffect(userMeditationRoutineListApiData.value) {
         withContext(Dispatchers.Main) {
@@ -125,7 +143,7 @@ fun RoutineListScreen(
                 isLoading.value = true
                 viewModel.getMeditationRoutineList(
                     token = token,
-                    userId = id
+                    userId = userID
                 )
             } else {
 
@@ -138,74 +156,126 @@ fun RoutineListScreen(
             }
         }
     }
-
-
-
-
-
     Box(
         modifier = Modifier
-            .fillMaxSize()
-            .background(blue),
-        contentAlignment = Alignment.Center
+            .fillMaxWidth()
+            .background(black),
+
     ) {
-        val isRound = context.resources.configuration.isScreenRound()
-        if (isRound) {
-            // For round screens: hello_world in the center, TimeText below it
-            Column(
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(top = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center,
-                    color = primary,
-                    text = "hello_world"
-                )
-                TimeText(modifier = Modifier.align(Alignment.CenterHorizontally))
-            }
-        } else {
-            // For non-round screens: hello_world in the top-left, TimeText in the top-right
+        Column (
+
+        ){
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp, top = 16.dp)
+                    .background(
+                        black
+                    )
+                    .weight(.6f) ,
+                contentAlignment = Alignment.TopCenter
             ) {
-                Text(
-                    modifier = Modifier.align(Alignment.TopStart),
-                    textAlign = TextAlign.Start,
-                    color = primary,
-                    text = "hello_world"
-                )
-                TimeText(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(end = 16.dp)
-                )
+                val isRound = context.resources.configuration.isScreenRound()
+                Log.d("isRound", "RoutineListScreen: $isRound")
+                if (isRound) {
+                    // For round screens: hello_world in the center, TimeText below it
+                    Column(
+                        modifier = Modifier
+                            .padding(top = 4.dp),
+                        verticalArrangement = Arrangement.spacedBy(2.dp)
+                    ) {
+                        Text(
+                            modifier = Modifier.align(Alignment.CenterHorizontally),
+                            textAlign = TextAlign.Center,
+                            color = white,
+                            text = "Unbounded",
+                            fontFamily = FontFamily(Font(R.font.dm_sans_semibold)),
+                        )
+                        TimeText(modifier = Modifier.align(Alignment.CenterHorizontally))
+                    }
+                } else {
+                    // For non-round screens: hello_world in the top-left, TimeText in the top-right
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+
+                            .padding(start = 3.dp, end = 3.dp, top = 0.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        Text(
+                            modifier = Modifier,
+                            textAlign = TextAlign.Start,
+                            color = white,
+                            text = "Unbounded",
+                            fontFamily = FontFamily(Font(R.font.dm_sans_semibold)),
+
+
+                            )
+
+                        TimeText(
+                            modifier = Modifier.padding(start = 40.dp),
+                            timeTextStyle = TimeTextDefaults.timeTextStyle(
+                               // formatter = TimeFormat12Hours,
+                                color = Color.White,
+                                fontSize = 14.sp,
+                               // fontFamily = FontFamily(Font(R.font.dm_sans_semibold))
+                            ),
+
+                            contentPadding = PaddingValues(horizontal = 4.dp, vertical = 2.dp), // Optional padding
+
+                        )
+                    }
+                }
             }
-        }
         Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentSize()
+                .fillMaxSize()
+                .weight(3f)
                 .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(primary, secondary)
-                    )
+                    black
                 ),
-            contentAlignment = Alignment.BottomCenter
+            contentAlignment = Alignment.TopStart
         ) {
             // ScalingLazyColumn to display the data
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        black
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                if (isLoading.value) {
+                    SpinningProgressBar(
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
+                if (loadError.value.isNotEmpty()) {
+                    Toast.makeText(context, loadError.value, Toast.LENGTH_SHORT).show()
+                    loadError.value = ""
+                }
+                if (dataMessage.value.isNotEmpty()) {
+                    Toast.makeText(context, dataMessage.value, Toast.LENGTH_SHORT).show()
+                    dataMessage.value = ""
+                }
+            }
             ScalingLazyColumn(
                 state = listState,
-                contentPadding = PaddingValues(16.dp)
+                modifier = Modifier.align(alignment = Alignment.TopStart)
             ) {
                 if (userMeditationRoutineList.isEmpty()) {
                     // Show a placeholder if the list is empty
                     item {
-                        Text(text = "No meditation routines available")
+                        Text(
+                            text = "No meditation routines available",
+                            style = TextStyle(
+                                fontSize = 12.sp,
+                                lineHeight = 49.sp,
+                                fontFamily = FontFamily(Font(R.font.dm_sans_semibold)),
+                                fontWeight = FontWeight(400),
+                                color = Color(0xFFFFFFFF),
+                                textAlign = TextAlign.Center,
+                            )
+                        )
                     }
                 } else {
                     // Dynamically render items from the API response
@@ -233,9 +303,11 @@ fun RoutineListScreen(
                                         isLoading.value = true
                                         Log.d("checkApicallingInRoutine", "-->active")
                                         viewModel.activeMeditationRoutineList(
-                                            dataStoreViewModel = dataStoreViewModel,
+                                             dataTransferViewModel,
+                                            navHostController,
                                             token = token,
-                                            presetId = item.id
+                                            presetId = item.id,
+                                            userID
                                         )
                                     } else {
                                         Toast.makeText(
@@ -245,23 +317,29 @@ fun RoutineListScreen(
                                         ).show()
                                     }
 
+                            },
+                            colors = ChipDefaults.chipColors(primary),
+                            shape = RoundedCornerShape(12.dp),// Handle the click event
+                            modifier = Modifier
+                                .background(transparant)
+                                .fillMaxWidth(),
 
-
-                            }, // Handle the click event
-                            modifier = Modifier.background(blue),
                             leadingIcon = {
                                 // Add an optional icon if needed (e.g., an avatar or status icon)
                             },
                             content = {
                                 // Use RowScope to define the content
-                                Column {
+                                Column(modifier = Modifier
+                                    .background(primary)
+                                    .padding(horizontal = 5.dp, vertical = 6.dp),
+                                    Arrangement.Top) {
                                   //  Text(text = item.description) // Main label
                                    Text(
                                         text = item.description,
                                         style = TextStyle(
-                                            fontSize = 14.sp,
+                                            fontSize = 12.sp,
                                             lineHeight = 49.sp,
-                                            fontFamily = FontFamily(Font(R.font.dm_sans_regular)),
+                                            fontFamily = FontFamily(Font(R.font.dm_sans_semibold)),
                                             fontWeight = FontWeight(400),
                                             color = Color(0xFFFFFFFF),
                                             textAlign = TextAlign.Center,
@@ -270,13 +348,13 @@ fun RoutineListScreen(
                                     Row {
 
                                         Text(
-                                            text ="$firstVar",
+                                            text ="${firstVar}m ",
                                             style = TextStyle(
-                                                fontSize = 14.sp,
+                                                fontSize = 12.sp,
                                                 lineHeight = 49.sp,
                                                 fontFamily = FontFamily(Font(R.font.dm_sans_regular)),
                                                 fontWeight = FontWeight(400),
-                                                color = Color(0xFFFFFFFF),
+                                                color = blue,
                                                 textAlign = TextAlign.Center,
                                             )
                                         )
@@ -284,7 +362,7 @@ fun RoutineListScreen(
                                         Text(
                                             text ="$firstActivity",
                                             style = TextStyle(
-                                                fontSize = 14.sp,
+                                                fontSize = 12.sp,
                                                 lineHeight = 49.sp,
                                                 fontFamily = FontFamily(Font(R.font.dm_sans_regular)),
                                                 fontWeight = FontWeight(400),
@@ -296,13 +374,13 @@ fun RoutineListScreen(
                                     Row {
 
                                         Text(
-                                            text ="$secondVar",
+                                            text ="${secondVar}m ",
                                             style = TextStyle(
-                                                fontSize = 14.sp,
+                                                fontSize = 12.sp,
                                                 lineHeight = 49.sp,
                                                 fontFamily = FontFamily(Font(R.font.dm_sans_regular)),
                                                 fontWeight = FontWeight(400),
-                                                color = Color(0xFFFFFFFF),
+                                                color = blue,
                                                 textAlign = TextAlign.Center,
                                             )
                                         )
@@ -310,7 +388,7 @@ fun RoutineListScreen(
                                         Text(
                                             text ="$secondActivity",
                                             style = TextStyle(
-                                                fontSize = 14.sp,
+                                                fontSize = 12.sp,
                                                 lineHeight = 49.sp,
                                                 fontFamily = FontFamily(Font(R.font.dm_sans_regular)),
                                                 fontWeight = FontWeight(400),
@@ -327,6 +405,9 @@ fun RoutineListScreen(
                     }
                 }
             }
+
+        }
+
         }
     }
 }
