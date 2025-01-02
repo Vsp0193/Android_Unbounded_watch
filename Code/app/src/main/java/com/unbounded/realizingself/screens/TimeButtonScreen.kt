@@ -68,6 +68,7 @@ import com.unbounded.realizingself.DataTransferViewModel
 import com.unbounded.realizingself.MeditationRoutineViewModel
 import com.unbounded.realizingself.TimerScreenViewModel
 import com.unbounded.realizingself.ui.theme.TintEyeColor
+import com.unbounded.realizingself.ui.theme.black
 import com.unbounded.realizingself.ui.theme.cyanColor
 import com.unbounded.realizingself.ui.theme.green97
 import com.unbounded.realizingself.ui.theme.primary
@@ -88,21 +89,13 @@ fun TimerButtonScreen(dataTransferViewModel: DataTransferViewModel) {
 
     val viewModel: TimerScreenViewModel = hiltViewModel()
 
-
-    val viewModel1: MeditationRoutineViewModel = hiltViewModel()
     val timeSegmentResponseDataApiData = remember {
         dataTransferViewModel.getUser()
     }
     val timeSegmentResponseData =
         timeSegmentResponseDataApiData?.userTimeSegments?.toMutableList() ?: mutableListOf()
    Log.d("uploadData", "uploadData:1 ${dataTransferViewModel.getUser()}")
-
-
-
-
-
-
-
+    viewModel.uploadData(timeSegmentResponseData)
 
     var nextSagmentName = ""
 
@@ -235,6 +228,7 @@ fun TimerButtonScreen(dataTransferViewModel: DataTransferViewModel) {
                 brush = Brush.verticalGradient(
                     colors = listOf(primary, primary, secondary)
                 )
+              //  black
             )
             .clickable(
                 indication = null,
@@ -260,7 +254,7 @@ fun TimerButtonScreen(dataTransferViewModel: DataTransferViewModel) {
         ) {
 
 
-            if (segmentDataApiCall.value?.userTimeSegments.isNullOrEmpty()) {
+            if (timeSegmentResponseData.isNullOrEmpty()) {
                 Log.d("ffdkwdkwdwkdwmdwdmwdkwdw", "segmentDataApiCall: ${segmentDataApiCall.value?.userTimeSegments?.size}")
                 Row(
                     modifier = Modifier
@@ -270,7 +264,7 @@ fun TimerButtonScreen(dataTransferViewModel: DataTransferViewModel) {
                     //  verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center // This arranges children horizontally in the center
                 ) {
-                    androidx.compose.material.Text(
+                   Text(
                         text = "You have no time segments. Please go to settings",
                         fontSize = 12.sp,
                         color = Color.White,
@@ -310,12 +304,16 @@ fun TimerButtonScreen(dataTransferViewModel: DataTransferViewModel) {
                                 var dotColor = Color.Gray
                                 val Purple45 = Color(0xFF6200EA)
 
-                                Canvas(
+                               /* Canvas(
                                     modifier = Modifier
                                         .fillMaxSize()
                                         .padding(16.dp)
                                 ) {
-                                    val innerRadius = size.minDimension / 2 - strokeWidth / 2
+                                    val screenHeight = configuration.screenHeightDp.dp
+                                    val screenWidth = configuration.screenWidthDp.dp
+                                   // (screenWidth/3).toPx()
+                                   // val innerRadius = size.minDimension / 2 - strokeWidth / 2
+                                    val innerRadius = size.minDimension / 3- strokeWidth / 3
                                     var startAngle = 270f
                                     var cumulativeDuration = 0f
                                     var completedSegmentIndices = mutableListOf<Int>()
@@ -429,8 +427,97 @@ fun TimerButtonScreen(dataTransferViewModel: DataTransferViewModel) {
                                             startAngle += sweepAngle
                                         }
 
-                                    }
+                                    }*/
 
+                                Canvas(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(screenHeight * 0.02f) // Padding set to 2% of screen height
+                                ) {
+                                    val screenHeight = configuration.screenHeightDp.dp
+                                    val screenWidth = configuration.screenWidthDp.dp
+                                    val strokeWidth = (screenWidth / 50).toPx() // Stroke width proportional to screen width
+                                    val innerRadius = size.minDimension / 3 - strokeWidth / 3
+                                    var startAngle = 270f
+                                    var cumulativeDuration = 0f
+                                    val completedSegmentIndices = mutableListOf<Int>()
+
+                                    viewModel.segments.forEachIndexed { index, segment ->
+                                        val segmentDuration = segment.duration.toFloat()
+                                        val segmentEndTime = cumulativeDuration + segmentDuration
+                                        val segmentProgress = when {
+                                            elapsedTime >= segmentEndTime -> 1f
+                                            elapsedTime > cumulativeDuration -> (elapsedTime - cumulativeDuration) / segmentDuration
+                                            else -> 0f
+                                        }
+
+                                        val sweepAngle = 360f * (segmentDuration / totalDuration) - 0.8f
+                                        val progressAngle = segmentProgress * sweepAngle
+                                        val dashArray2 =  floatArrayOf(screenWidth / 100f, screenWidth / 50f)
+                                        // Draw grey arc
+                                        drawArc(
+                                            color = Color.Gray,
+                                            startAngle = startAngle,
+                                            sweepAngle = sweepAngle,
+                                            useCenter = false,
+                                            style = Stroke(
+                                                width = strokeWidth,
+                                                pathEffect = PathEffect.dashPathEffect(
+                                                    dashArray2// Dash sizes proportional to screen width
+                                                )
+                                            )
+                                        )
+
+                                        // Draw cyan arc
+                                        drawArc(
+                                            color = cyanColor,
+                                            startAngle = startAngle,
+                                            sweepAngle = progressAngle,
+                                            useCenter = false,
+                                            style = Stroke(
+                                                width = strokeWidth,
+                                                pathEffect = PathEffect.dashPathEffect(
+                                                    dashArray2
+                                                )
+                                            )
+                                        )
+
+                                        val radians = Math.toRadians(startAngle.toDouble())
+                                        val center = Offset(size.width / 2, size.height / 2)
+                                        val rectTopLeftX =
+                                            center.x + (innerRadius + strokeWidth / 2) * cos(radians).toFloat() - strokeWidth / 2
+                                        val rectTopLeftY =
+                                            center.y + (innerRadius + strokeWidth / 2) * sin(radians).toFloat() - strokeWidth / 2
+                                        val pivot = Offset(rectTopLeftX + strokeWidth / 2, rectTopLeftY + strokeWidth / 2)
+                                        rotate(degrees = startAngle, pivot = pivot) {
+                                            drawRoundRect(
+                                                color = primary,
+                                                size = Size(strokeWidth, (screenHeight / 50)), // Rect height proportional to screen height
+                                                topLeft = Offset(rectTopLeftX, rectTopLeftY),
+                                                cornerRadius = CornerRadius(screenWidth / 200, screenWidth / 200), // Rounded corners proportional to screen width
+                                                style = Stroke(width = strokeWidth / 2)
+                                            )
+                                        }
+
+                                        // Determine the color for the segment indicator
+                                        val indicatorColor = if (completedSegmentIndices.contains(index - 1)) cyanColor else dotColor
+                                        drawCircle(
+                                            color = indicatorColor,
+                                            radius = strokeWidth / 3,
+                                            center = Offset(
+                                                x = (center.x + (innerRadius + strokeWidth / 2) * cos(radians)).toFloat(),
+                                                y = (center.y + (innerRadius + strokeWidth / 2) * sin(radians)).toFloat()
+                                            )
+                                        )
+
+                                        // Update completed segment indices
+                                        if (segment.isComplete && index < viewModel.segments.size - 1) {
+                                            completedSegmentIndices.add(index)
+                                        }
+                                        cumulativeDuration += segmentDuration
+                                        startAngle += sweepAngle
+                                    }
+                                }
 
 
                                 // Timer code with view

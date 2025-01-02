@@ -10,5 +10,6 @@ data class UserTimeSegment(
     val presetId: Int?,
     val timeSegmentType: Int?,
     val updatedAt: String?,
-    val userId: Int?
+    val userId: Int?,
+    var segmentStatus: Boolean? = false // Set to false by default
 )

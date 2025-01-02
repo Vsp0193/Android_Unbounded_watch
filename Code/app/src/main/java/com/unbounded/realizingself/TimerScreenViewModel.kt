@@ -12,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -35,9 +36,61 @@ class TimerScreenViewModel @Inject constructor(private val repository: UnboundRe
 {
     val segmentDataApiCall = mutableStateOf<TimeSegmentResponse?>(value = null)
 
-
     private val _timeRemaining = MutableLiveData(0)
     val timeRemaining: LiveData<Int> get() = _timeRemaining
+    fun uploadData(data: MutableList<UserTimeSegment>) {
+        // Create a TimeSegmentResponse (or modify as per your logic)
+        Log.d("uploadData", "uploadData: ${data.size}")
+        segmentDataApiCall.value =null
+        val response = TimeSegmentResponse(userTimeSegments = data)
+
+        // Update the state
+        segmentDataApiCall.value = response
+
+        segments.clear()
+
+        Log.d("djsds", "response:${data.size} ")
+        val newSegments = response.userTimeSegments?.map { userSegment ->
+            Segment(
+                duration = userSegment.duration!!,
+                audio = userSegment.audio!!,
+                isComplete = false,
+                createdAt = userSegment.createdAt!!,
+                description = userSegment.description!!,
+                id = userSegment.id!!,
+                order = userSegment.order!!,
+                presetId = userSegment.presetId!!,
+                timeSegmentType = userSegment.timeSegmentType!!,
+                updatedAt = userSegment.updatedAt!!,
+                userId = userSegment.userId!!,
+                segmentStatus = userSegment.segmentStatus
+            )
+        }
+
+        segments = newSegments!!.toMutableStateList()
+        // segments.rep(newSegments)
+        /* segmentDataApiCall.value?.userTimeSegments!!.forEach { userSegment ->
+             segments.add(Segment(userSegment.duration,
+                 userSegment.audio,
+                 isComplete = false,
+                 userSegment.createdAt,
+                 userSegment.description,
+                 userSegment.id,
+                 userSegment.order,
+                 userSegment.presetId,
+                 userSegment.timeSegmentType,
+                 userSegment.updatedAt,
+                 userSegment.userId,
+                 userSegment.segmentStatus,
+                 ))
+         }*/
+        Log.d("djsds", "segments:${segments.size} ")
+
+        // Update total duration
+        totalDuration.value = segments.sumOf { it.duration }
+
+
+    }
 
 
     var isTimerPaused = false
@@ -47,7 +100,6 @@ class TimerScreenViewModel @Inject constructor(private val repository: UnboundRe
     var actualMeditationTime = mutableStateOf(0)
     var totalDuration = mutableStateOf(1) // Initialized with 1 to avoid division by zero
     var isRunning = mutableStateOf(false)
-
 
     var segments = mutableStateListOf<Segment>()
     /*  val _segments: LiveData<List<Segment>> get() = segments
@@ -72,15 +124,6 @@ class TimerScreenViewModel @Inject constructor(private val repository: UnboundRe
     fun initContext(context: Context) {
         mcontext = context
     }
-    fun uploadData(data: MutableList<UserTimeSegment>) {
-        // Create a TimeSegmentResponse (or modify as per your logic)
-        Log.d("uploadData", "uploadData: ${data.size}")
-        val response = TimeSegmentResponse(userTimeSegments = data)
-
-        // Update the state
-        segmentDataApiCall.value = response
-    }
-
 
     var userTimeSegments: List<UserTimeSegment> = emptyList()
     private val _isFloatingTextVisible = MutableLiveData(true)
@@ -107,8 +150,6 @@ class TimerScreenViewModel @Inject constructor(private val repository: UnboundRe
 
     val _isProgressCompleted = MutableLiveData(false)
     val isProgressCompleted: LiveData<Boolean> get() = _isProgressCompleted
-
-
 
 
     private val _isSuccess = MutableLiveData(false)
@@ -156,8 +197,6 @@ class TimerScreenViewModel @Inject constructor(private val repository: UnboundRe
                         }
                     }
 
-
-
                 }
                 isRunning.value = false
             }
@@ -166,9 +205,10 @@ class TimerScreenViewModel @Inject constructor(private val repository: UnboundRe
 
     fun nextSegment() {
         pauseTimer()
-        val currentDuration = segments.take(currentIndex).sumOf { it.duration }
+
+        val currentDuration = segments.take(currentIndex)?.sumOf { it.duration }
         val nextSegmentStart = segments.getOrNull(currentIndex)?.duration ?: totalDuration.value
-        elapsedTime.value = currentDuration + nextSegmentStart
+        elapsedTime.value = currentDuration?.plus(nextSegmentStart)!!
 
 
         if ( elapsedTime.value ===totalDuration.value){
@@ -184,11 +224,9 @@ class TimerScreenViewModel @Inject constructor(private val repository: UnboundRe
         var accumulatedTime = 0
 
 
-
-
         for (i in segments.indices) {
             accumulatedTime += segments[i].duration
-            _currentSegmentName.value = segments[i].description
+            _currentSegmentName.value = segments[i].description!!
             if (elapsedTime.value < accumulatedTime) {
                 currentIndex = i
 
@@ -201,7 +239,7 @@ class TimerScreenViewModel @Inject constructor(private val repository: UnboundRe
             }
             if (!segments[i].isComplete) {
                 segments[i].isComplete = true
-                playAudioForSegment(segments[i].audio)
+                playAudioForSegment(segments[i].audio.toString())
 
             }
 
@@ -259,10 +297,6 @@ class TimerScreenViewModel @Inject constructor(private val repository: UnboundRe
     var loadError = mutableStateOf("")
     var isLoading = mutableStateOf(false)
     var dataMessage = mutableStateOf("")
-
-
-
-
 
 
     fun updateCompleteSegment(isUpdate: Boolean) {
@@ -353,10 +387,6 @@ class TimerScreenViewModel @Inject constructor(private val repository: UnboundRe
         super.onCleared()
         timerJob?.cancel()  // Ensure job is cancelled when ViewModel is cleared
     }
-
-
-
-
 }
 
 fun getUTCTimeZoneDifference(timeZone: TimeZone = TimeZone.getDefault()): String {
@@ -376,9 +406,6 @@ data class Segment(val duration: Int,
                    val updatedAt: String,
                    val userId: Int,
                    var segmentStatus: Boolean?
-
-
-
 )
 
 
